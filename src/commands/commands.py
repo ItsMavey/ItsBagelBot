@@ -32,10 +32,7 @@ class CommandManager:
         try:
             result = await func(ctx)
 
-            result_parts = result.split('\n') if isinstance(result, str) else []
-
-            for part in result_parts:
-                await ctx.send(part)
+            await ctx.send(result)
 
         except TypeError as e:
             await ctx.send(f"Invalid usage: {e}")

@@ -35,7 +35,6 @@ class TwitchBot:
             message=message,
             badges=badges,
             id=user_id,
-            send_func=HELIX.send  # allow ctx.send() to use Helix directly
         )
 
         # Let the command manager handle dispatching

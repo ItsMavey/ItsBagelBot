@@ -55,7 +55,7 @@ class Context:
 
         request_event = EventChatRequest(
             payload=ChatRequestPayload(
-                message="🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯\n🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯\n🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯🥯",
+                message=text,
             )
         )
 
