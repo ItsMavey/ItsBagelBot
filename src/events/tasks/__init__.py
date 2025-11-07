@@ -1,0 +1,2 @@
+from events.tasks.onAuthRefresh import EventAuthRefresh
+from events.tasks.onChatRequest import EventChatRequest
