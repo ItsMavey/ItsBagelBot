@@ -1,5 +1,3 @@
-from API import HELIX
-
 from events.twitch import EventChatCommand, EventChatMessage
 from events.tasks import EventChatRequest
 from events.tasks.payloads import ChatRequestPayload
