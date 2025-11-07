@@ -32,7 +32,8 @@ class CommandManager:
         try:
             result = await func(ctx)
 
-            await ctx.send(result)
+            if result:
+                await ctx.send(result)
 
         except TypeError as e:
             await ctx.send(f"Invalid usage: {e}")

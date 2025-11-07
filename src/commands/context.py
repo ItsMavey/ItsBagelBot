@@ -1,12 +1,13 @@
-from API import HELIX
 from events.tasks import EventChatRequest
 from events.tasks.payloads import ChatRequestPayload
 from utils import EventBUS
 
+from payload import Permission
+
 
 class Context:
     """Lightweight context object passed to commands."""
-    def __init__(self, user, id, message, badges=None, send_func=None):
+    def __init__(self, user, id, message, permission: Permission , send_func=None):
         self.user = user
         self.id = id
         self.raw_message = message
@@ -27,14 +28,13 @@ class Context:
             self.command = None
             self.message = message.strip()
 
-        self.badges = badges or []
         self.send_func = send_func
 
         # Permission flags from Twitch badges
-        self.is_broadcaster = "broadcaster" in self.badges
-        self.is_mod = "moderator" in self.badges or self.is_broadcaster
-        self.is_vip = "vip" in self.badges
-        self.is_sub = "subscriber" in self.badges
+        self.is_broadcaster = permission["is_broadcaster"]
+        self.is_mod = permission["is_mod"]
+        self.is_vip = permission["is_vip"]
+        self.is_subscriber = permission["is_subscriber"]
 
     async def send(self, text: str):
         """Send a message back to chat using either the custom sender or Helix."""
@@ -60,8 +60,3 @@ class Context:
         )
 
         await EventBUS.publish(request_event)
-
-
-
-    def __repr__(self):
-        return f"<Context user={self.user} badges={self.badges}>"

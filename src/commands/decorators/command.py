@@ -12,32 +12,33 @@ def command(name=None, aliases=None, description=None):
         description (str): Short description for help menus.
     """
     def decorator(func):
-        cmd_name = name or func.__name__  # use provided name or function name
+        cmd_name = name or func.__name__
         aliases_list = aliases or []
 
-        # Attach metadata for later rebinding if needed
+        # Keep original metadata for help/rebinding
         func.__command_meta__ = {
             "name": cmd_name,
             "aliases": aliases_list,
             "description": description or "",
         }
 
-        # Store the function and metadata in the registry
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            # The real callable used at runtime
+            return await func(*args, **kwargs)
+
+        # ✅ Register the WRAPPER so that any outer decorators (mod, vip, etc.)
+        # applied later are still respected when invoked
         COMMAND_REGISTRY[cmd_name] = {
-            "func": func,
+            "func": wrapper,
             "aliases": aliases_list,
-            "description": description or ""
+            "description": description or "",
         }
 
-        # Also register each alias to point to the same command
+        # ✅ Rebind aliases to the same registry entry (same dict)
         for alias in aliases_list:
             COMMAND_REGISTRY[alias] = COMMAND_REGISTRY[cmd_name]
 
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            # just wrap it so it can be called normally later
-            return await func(*args, **kwargs)
-
-        return wrapper
+        return wrapper  # important for decorator chaining
 
     return decorator

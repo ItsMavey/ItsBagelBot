@@ -1,5 +1,7 @@
 from typing import TypedDict
 
+from payload import Permission
+
 class ChatMessagePayload(TypedDict):
     username: str
     user_id: str
@@ -12,7 +14,6 @@ class ChatCommandPayload(TypedDict):
     username: str
     user_id: str
     command: str
-    is_mod: bool
-    is_vip: bool
-    is_subscriber: bool
+
+    permission: Permission
 

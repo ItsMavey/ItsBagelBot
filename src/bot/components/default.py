@@ -10,7 +10,6 @@ class Default(Component):
     def __init__(self):
         self.component_name = "Default Commands"
 
-
     @cmd.command(name='bagel', aliases=['bagels'], description='Bagel commands')
     async def bagel(self, ctx):
         return f"🥯 @{ctx.user} here a bagel for you"

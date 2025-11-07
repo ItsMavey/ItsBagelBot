@@ -13,4 +13,6 @@ class BaseHandler:
         username = event.event.chatter_user_name
         user_id = event.event.chatter_user_id
 
-        return username, user_id, msg, is_mod, is_vip, is_sub
+        broadcaster_id = event.event.broadcaster_user_id
+
+        return username, user_id, broadcaster_id, msg, is_mod, is_vip, is_sub

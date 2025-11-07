@@ -22,7 +22,6 @@ class TwitchBot:
         payload = event.payload
         username = payload["username"]
         message = payload["command"]
-        badges = payload.get("badges", [])
         user_id = payload["user_id"]
 
         print(f"🔥 Command received from {username}: {message}")
@@ -31,7 +30,7 @@ class TwitchBot:
         ctx = Context(
             user=username,
             message=message,
-            badges=badges,
+            permission=payload["permission"],
             id=user_id,
         )
 
