@@ -30,10 +30,6 @@ class TwitchAuthHelper:
     All user lookups now rely on the username (not user_id).
     """
 
-    def __init__(self, client_id: str = None, client_secret: str = None):
-        self.client_id = client_id or TWITCH["CLIENT_ID"]
-        self.client_secret = client_secret or TWITCH["CLIENT_SECRET"]
-
     # -------------------------------
     # User and Token Retrieval Helpers
     # -------------------------------
@@ -130,7 +126,7 @@ class TwitchAuthHelper:
 
         auth_url = (
             f"https://id.twitch.tv/oauth2/authorize"
-            f"?client_id={self.client_id}"
+            f"?client_id={TWITCH['CLIENT_ID']}"
             f"&redirect_uri={TWITCH['REDIRECT_URI']}"
             f"&response_type=code"
             f"&scope={scopes}"

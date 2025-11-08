@@ -12,6 +12,20 @@ import os
 from twitchAPI.type import AuthScope
 from datetime import datetime, UTC
 
+
+from utils import SystemBUS
+
+from events.tasks import EventSecretRefresh
+
+SystemBUS.subscribe(EventSecretRefresh, lambda event: print("Secret refresh event received."))
+
+
+class Settings:
+    """Application settings and configurations."""
+
+
+
+
 BOT_NAME = 'ItsBagelBot'
 BOT_LOGIN = BOT_NAME.lower()
 

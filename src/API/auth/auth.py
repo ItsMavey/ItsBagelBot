@@ -8,12 +8,9 @@ from API.auth import TwitchAuthHelper
 
 
 class TwitchAuthHandler:
-    client_id = TWITCH["CLIENT_ID"]
-    client_secret = TWITCH["CLIENT_SECRET"]
-    redirect_uri = TWITCH["REDIRECT_URI"]
 
     def __init__(self):
-        self.helper = TwitchAuthHelper(self.client_id, self.client_secret)
+        self.helper = TwitchAuthHelper()
         self.access_token = self.app_token().access_token
 
 #%% OAUTH TOKEN HANDLING
