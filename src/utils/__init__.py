@@ -3,4 +3,7 @@ from utils.bus import Bus
 EventBUS = Bus()
 SystemBUS = Bus()
 
-import utils.settings
+from utils.settings import Settings
+
+
+settings = Settings()

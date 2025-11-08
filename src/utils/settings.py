@@ -1,94 +1,89 @@
 """
-This module handles application settings and configurations.
+Centralized application settings.
 
-It provides all the secret keys, database configurations, and other
-settings required for the application to run.
-
-Doppler will be used to manage and inject these secrets into the environment.
+Uses environment variables (managed via Doppler or .env) and provides
+a singleton `settings` instance for easy access across the project.
 """
 
 import os
-
-from twitchAPI.type import AuthScope
 from datetime import datetime, UTC
-
+from twitchAPI.type import AuthScope
 
 from utils import SystemBUS
-
 from events.tasks import EventSecretRefresh
-
-SystemBUS.subscribe(EventSecretRefresh, lambda event: print("Secret refresh event received."))
 
 
 class Settings:
     """Application settings and configurations."""
 
+    def __init__(self):
+        self._load_secrets()
+        SystemBUS.subscribe(EventSecretRefresh, self.reload)
+
+    def _load_secrets(self):
+        """Reload all environment-dependent configurations."""
+        self.WAKE_UP_TIME = datetime.now(UTC)
+
+        self.BOT_NAME = 'ItsBagelBot'
+        self.BOT_LOGIN = self.BOT_NAME.lower()
+        self.MAIN_BROADCASTER = os.getenv('MAIN_BROADCASTER', 'itsmavey').lower()
+        self.SPECIAL_ID = os.getenv('SPECIAL_ID')
+
+        self.CONTACT = {
+            'EMAIL': os.getenv('CONTACT_EMAIL', "contact@itsmavey.com"),
+            'DISCORD': os.getenv('CONTACT_DISCORD', "https://discord.gg/SZ2remwSDv"),
+        }
+
+        self.SERVERS = [("twitch", "irc.chat.twitch.tv")]
+
+        self.SCOPES = {
+            'bot': [
+                AuthScope.CHAT_READ,
+                AuthScope.CHAT_EDIT,
+                AuthScope.USER_READ_CHAT,
+                AuthScope.USER_WRITE_CHAT,
+                AuthScope.USER_BOT,
+                AuthScope.CHANNEL_BOT,
+                AuthScope.MODERATOR_READ_FOLLOWERS,
+            ],
+            'broadcaster': [
+                AuthScope.MODERATOR_READ_FOLLOWERS,
+                AuthScope.USER_READ_CHAT,
+                AuthScope.USER_WRITE_CHAT,
+            ],
+        }
+
+        self.DATABASE_ENGINE = os.getenv("DATABASE_ENGINE", "sqlite")
+        self.DATABASE = {
+            'postgres': {
+                "NAME": os.getenv("POSTGRES_DB"),
+                "ENGINE": "postgres",
+                "USER": os.getenv("POSTGRES_USER"),
+                "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
+                "HOST": os.getenv("POSTGRES_HOST"),
+                "PORT": int(os.getenv("POSTGRES_PORT", 5432)),
+            },
+            'sqlite': {
+                "NAME": "bagelbot.db",
+                "ENGINE": "sqlite",
+            },
+        }
+
+        self.SPOTIFY = {
+            'CLIENT_ID': os.getenv('SPOTIFY_CLIENT_ID'),
+            'CLIENT_SECRET': os.getenv('SPOTIFY_CLIENT_SECRET'),
+            'REDIRECT_URI': os.getenv('SPOTIFY_REDIRECT_URI', 'http://127.0.0.1:8080'),
+        }
+
+        self.TWITCH = {
+            'CLIENT_ID': os.getenv('TWITCH_CLIENT_ID'),
+            'CLIENT_SECRET': os.getenv('TWITCH_CLIENT_SECRET'),
+            'REDIRECT_URI': os.getenv('TWITCH_REDIRECT', 'http://localhost:17563'),
+        }
 
 
 
-BOT_NAME = 'ItsBagelBot'
-BOT_LOGIN = BOT_NAME.lower()
-
-MAIN_BROADCASTER = os.getenv('MAIN_BROADCASTER', 'itsmavey').lower()
-
-WAKE_UP_TIME = datetime.now(UTC)
-
-SPECIAL_ID = os.getenv('SPECIAL_ID')
-
-CONTACT = {
-    'EMAIL': os.getenv('CONTACT_EMAIL', "contact@itsmavey.com"),
-    'DISCORD': os.getenv('CONTACT_DISCORD', "https://discord.gg/SZ2remwSDv"),
-}
-
-SERVERS = [
-    ("twitch", "irc.chat.twitch.tv")
-]
-
-SCOPES = {
-    'bot': [
-        AuthScope.CHAT_READ,
-        AuthScope.CHAT_EDIT,
-        AuthScope.USER_READ_CHAT,
-        AuthScope.USER_WRITE_CHAT,
-        AuthScope.USER_BOT,
-        AuthScope.CHANNEL_BOT,
-        AuthScope.MODERATOR_READ_FOLLOWERS,
-    ],
-
-    'broadcaster': [
-        AuthScope.MODERATOR_READ_FOLLOWERS,
-        AuthScope.USER_READ_CHAT,
-        AuthScope.USER_READ_CHAT,
-        AuthScope.USER_WRITE_CHAT,
-    ]
-}
-
-DATABASE_ENGINE = os.getenv("DATABASE_ENGINE", "sqlite")
-
-DATABASE = {
-    'postgres': {
-        "NAME": os.getenv("POSTGRES_DB"),
-        "ENGINE": "postgres",
-        "USER": os.getenv("POSTGRES_USER"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
-        "HOST": os.getenv("POSTGRES_HOST"),
-        "PORT": int(os.getenv("POSTGRES_PORT")),
-    },
-
-    'sqlite': {
-        "NAME": "bagelbot.db",
-        "ENGINE": "sqlite",
-    }
-}
-
-SPOTIFY = {
-    'CLIENT_ID': os.getenv('SPOTIFY_CLIENT_ID'),
-    'CLIENT_SECRET': os.getenv('SPOTIFY_CLIENT_SECRET'),
-    'REDIRECT_URI': os.getenv('SPOTIFY_REDIRECT_URI', 'http://127.0.0.1:8080')
-}
-
-TWITCH = {
-    'CLIENT_ID': os.getenv('TWITCH_CLIENT_ID'),
-    'CLIENT_SECRET': os.getenv('TWITCH_CLIENT_SECRET'),
-    'REDIRECT_URI': os.getenv('TWITCH_REDIRECT', 'http://localhost:17563'),
-}
+    async def reload(self, event: EventSecretRefresh):
+        """Reload settings on secret refresh event."""
+        self._load_secrets()
+        print("🌷 Settings reloaded.")
