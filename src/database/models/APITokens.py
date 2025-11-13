@@ -13,9 +13,9 @@ class APITokens(BaseModel):
 
     name = CharField()
     streamer_name = CharField(default='unknown', null=True)
-    access_token = CharField()
+    access_token = CharField(null=True)
     refresh_token = CharField(null=True)
-    expires_at = DateTimeField()
+    expires_at = DateTimeField(null=True)
 
     class Meta:
         table_name = 'api_tokens'

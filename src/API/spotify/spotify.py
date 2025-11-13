@@ -7,10 +7,10 @@ It includes all authentication and request handling functionalities towards the 
 It also includes methods for playback, queue management, and searching tracks
 with a custom ranking algorithm for fuzzy matching.
 """
-from jaraco.functools import retry
 from spotipy import Spotify, SpotifyException
 from spotipy.oauth2 import SpotifyOAuth
-from twitchAPI.oauth import refresh_access_token
+
+from API.spotify import SpotifyHelper
 
 from utils import settings, Logger
 
@@ -27,10 +27,34 @@ class SpotifyAPI:
             scope="user-modify-playback-state user-read-playback-state playlist-modify-private"
         )
 
-        if settings.SPOTIFY['REFRESH_TOKEN']:
-            self.auth.refresh_access_token(settings.SPOTIFY['REFRESH_TOKEN'])
+        self.helper = SpotifyHelper()
+
+        self.refresh_token()
 
         self.spotify = Spotify(auth_manager=self.auth)
+
+
+
+    def refresh_token(self, username: str = settings.MAIN_BROADCASTER):
+
+        if not username or username.strip() == "":
+            self._logger.warning("No username provided for Spotify token refresh.")
+            return
+
+        token = self.helper.get_refresh_token(username)
+
+        if token:
+            self.auth.refresh_access_token(token)
+            self._logger.info("🔄 Retrieved Spotify refresh token.")
+
+        token = self.auth.get_cached_token()
+
+        if token:
+            self.helper.save_refresh_token(username, token['refresh_token'])
+            self._logger.info("✅ Saved Spotify refresh token.")
+
+        else:
+            self._logger.warning("No Spotify token available to refresh.")
 
     # %% --- Playback Controls ---
 
@@ -41,6 +65,7 @@ class SpotifyAPI:
             return "Playback started."
         except SpotifyException as e:
             self._logger.error(f"[Spotify] Failed to start playback: {e}")
+            return "Failed to start playback. Please ensure a device is active."
 
     def pause(self):
         try:
@@ -49,6 +74,8 @@ class SpotifyAPI:
             return "Playback paused."
         except SpotifyException as e:
             self._logger.error(f"[Spotify] Failed to pause playback: {e}")
+            return "Failed to stop playback. Please ensure a device is active."
+
 
     def next_track(self):
         try:
@@ -57,6 +84,8 @@ class SpotifyAPI:
             return "Skipped to next track."
         except SpotifyException as e:
             self._logger.error(f"[Spotify] Failed to skip to next track: {e}")
+            return "Failed to go skip song. Please ensure a device is active."
+
 
     def previous_track(self):
         try:
@@ -65,6 +94,7 @@ class SpotifyAPI:
             return "Went back to previous track."
         except SpotifyException as e:
             self._logger.error(f"[Spotify] Failed to go to previous track: {e}")
+            return "Failed to go to previous song. Please ensure a device is active."
 
     def volume(self, volume_percent):
         try:
@@ -73,6 +103,7 @@ class SpotifyAPI:
             return "Volume set to {}%.".format(volume_percent)
         except SpotifyException as e:
             self._logger.error(f"[Spotify] Failed to set volume: {e}")
+            return "Failed to start playback. Please ensure a device is active."
 
 
     def is_playing(self):
@@ -95,6 +126,7 @@ class SpotifyAPI:
                 self.spotify.add_to_queue(track_uri)
         except SpotifyException as e:
             self._logger.error(f"[Spotify] Failed to add track to queue: {e}")
+            return "Failed to add track to queue. Please ensure a device is active."
 
     def search_to_queue(self, query):
         try:
