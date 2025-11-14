@@ -17,4 +17,4 @@ class ChatListener:
             user_id=bot_id,
             callback=self.handler.dispatch,
         )
-        self._logger.info("📝 Registered: channel.chat_message")
+        self._logger.info("🔴 Registered: channel.chat_message")

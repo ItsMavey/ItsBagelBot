@@ -6,6 +6,9 @@ It will also parse the commands and invoke the functions with the decorated comm
 
 from commands import COMMAND_REGISTRY
 
+from utils import EventBUS
+from events.twitch import EventStreamOnline, EventStreamOffline
+
 """ DO NOT REMOVE !!! """
 from bot import components # Allow registration of commands via imports in the __init__.py file
 
@@ -14,6 +17,18 @@ class CommandManager:
     """Responsible for finding and executing commands."""
     def __init__(self):
         self.commands = COMMAND_REGISTRY  # all registered commands
+        self.stream_status = False  # default stream status
+
+        EventBUS.subscribe(EventStreamOnline, self.stream_online)
+        EventBUS.subscribe(EventStreamOffline, self.stream_offline)
+
+    def stream_online(self, event: EventStreamOnline):
+        """Set the stream status to online."""
+        self.stream_status = True
+
+    def stream_offline(self, event: EventStreamOffline):
+        """Set the stream status to offline."""
+        self.stream_status = False
 
     async def dispatch(self, ctx):
         """Parse and execute a command message."""
@@ -27,6 +42,13 @@ class CommandManager:
             return None
 
         func = cmd["func"]
+
+        requires_live = bool(cmd.get("stream_status", False))
+
+        if requires_live and not self.stream_status:
+            await ctx.send(f"@{ctx.user} This command is only available when the stream is live.")
+
+            return None
 
         # Run the command safely
         try:

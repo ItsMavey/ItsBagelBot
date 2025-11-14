@@ -2,7 +2,9 @@ from functools import wraps
 
 from commands import COMMAND_REGISTRY
 
-def command(name=None, aliases=None, description=None):
+
+
+def command(name=None, aliases=None, description=None, stream_status=False):
     """
     Decorator to mark a function as a bot command.
 
@@ -10,6 +12,7 @@ def command(name=None, aliases=None, description=None):
         name (str): Optional custom name for the command. Defaults to the function name.
         aliases (list[str]): Alternative trigger names for the command.
         description (str): Short description for help menus.
+        stream_status (bool): If True, command is only available when the stream is live.
     """
     def decorator(func):
         cmd_name = name or func.__name__
@@ -20,6 +23,7 @@ def command(name=None, aliases=None, description=None):
             "name": cmd_name,
             "aliases": aliases_list,
             "description": description or "",
+            "stream_status": stream_status,
         }
 
         @wraps(func)
@@ -33,9 +37,10 @@ def command(name=None, aliases=None, description=None):
             "func": wrapper,
             "aliases": aliases_list,
             "description": description or "",
+            "stream_status": stream_status,
         }
 
-        # ✅ Rebind aliases to the same registry entry (same dict)
+        # Rebind aliases to the same registry entry (same dict)
         for alias in aliases_list:
             COMMAND_REGISTRY[alias] = COMMAND_REGISTRY[cmd_name]
 
