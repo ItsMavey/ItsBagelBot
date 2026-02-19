@@ -27,5 +27,5 @@ func main() {
 func Shutdown() {
 	zap.L().Info("Shutting down...")
 
-	_ := zap.L().Sync()
+	_ = zap.L().Sync()
 }
