@@ -158,7 +158,7 @@ Currently in development, but will be built with the following technologies:
 #### Monitoring & Logging
 
 ![Zap](https://img.shields.io/badge/Zap-000000?style=for-the-badge&logo=uber&logoColor=white)
-![New Relic](https://img.shields.io/badge/newrelic-%2300b1cc.svg?style=for-the-badge&logo=newrelic&logoColor=white)
+![NewLogger Relic](https://img.shields.io/badge/newrelic-%2300b1cc.svg?style=for-the-badge&logo=newrelic&logoColor=white)
 
 
 ### Security

@@ -7,7 +7,7 @@ import (
 
 var AtomLevel = zap.NewAtomicLevel()
 
-func New(env string) *zap.Logger {
+func NewLogger(env string) *zap.Logger {
 
 	var config zap.Config
 

@@ -11,7 +11,7 @@ import (
 
 func TestNew_Development(t *testing.T) {
 	// 1. We use 'log' (instance) so we don't block 'logger' (package)
-	log := logger.New("development")
+	log := logger.NewLogger("development")
 
 	assert.NotNil(t, log)
 
@@ -21,7 +21,7 @@ func TestNew_Development(t *testing.T) {
 }
 
 func TestNew_Production(t *testing.T) {
-	log := logger.New("production")
+	log := logger.NewLogger("production")
 
 	assert.NotNil(t, log)
 
@@ -32,7 +32,7 @@ func TestNew_Production(t *testing.T) {
 
 func TestAtomLevel_DynamicSwitching(t *testing.T) {
 	// Start with Production (Info level only)
-	log := logger.New("production")
+	log := logger.NewLogger("production")
 
 	// Verify initial state
 	assert.False(t, log.Core().Enabled(zap.DebugLevel))
@@ -45,7 +45,7 @@ func TestAtomLevel_DynamicSwitching(t *testing.T) {
 }
 
 func TestGlobalReplacement(t *testing.T) {
-	log := logger.New("production")
+	log := logger.NewLogger("production")
 
 	// Verify that zap.L() (the global logger) was updated to match our new logger
 	// We compare the Core addresses to see if they are the same underlying object
@@ -54,7 +54,7 @@ func TestGlobalReplacement(t *testing.T) {
 
 func TestNew_Production_ConfigFormat(t *testing.T) {
 	// Optional: Verify specific production settings exist
-	log := logger.New("production")
+	log := logger.NewLogger("production")
 
 	// We can't easily check internal config struct values,
 	// but we can check behavior (like Level) which we did above.
