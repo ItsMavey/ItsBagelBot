@@ -103,6 +103,8 @@ func (s *ShardSupervisor) monitor(ctx context.Context, newConn *transport.WebSoc
 				return false, err
 			}
 
+			return false, nil
+
 		case sessionID := <-s.connected:
 			s.currentSessionID = sessionID
 			zap.L().Info("Session active", zap.Int("shard", s.ShardID), zap.String("id", sessionID))
